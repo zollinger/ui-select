@@ -79,9 +79,9 @@ uis.directive('uiSelectChoices',
 
         scope.$watch('$select.open', function(open) {
           if (open) {
-            tElement.attr('role', 'listbox');
+            element.attr('role', 'listbox');
           } else {
-            tElement.removeAttr('role');
+            element.removeAttr('role');
           }
         });
       };
