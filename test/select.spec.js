@@ -2060,6 +2060,62 @@ describe('ui-select tests', function () {
 
     });
 
+    it('input size should properly account for container paddings if box-sizing is set to border-box', function () {
+      var el = createUiSelectMultiple({
+        tagging: '',
+        taggingLabel: 'false'
+      });
+
+      angular.element(document.body).append(el);
+      // Set fixed match item width for easier testing
+      var style = $(
+        '<style> \
+          * { box-sizing: border-box; } \
+          .ui-select-container { position: relative; } \
+          .ui-select-container > div { font-size: 0; } \
+          .ui-select-container > div > span, \
+          .ui-select-container > div > input { font-size: 14px; } \
+          .ui-select-search { border: 0; } \
+          .ui-select-match-item { display: inline-block; overflow: hidden; width: 260px; white-space: nowrap; } \
+          .ui-select-search { outline: 0; border: 0; margin: 0; padding: 0; } \
+        </style>'
+      );
+
+      $('head').append(style);
+
+      var searchInput = el.find('.ui-select-search');
+
+      el.css({
+        paddingLeft: '6px',
+        paddingRight: '6px'
+      });
+
+      $timeout.flush();
+
+      var fullWidth = searchInput.outerWidth();
+      var matchItemWidth = 260;
+
+      expect(searchInput.outerWidth()).toBe(el.width() - 6); // Full width minus padding due to nested div
+
+      clickItem(el, 'Wladimir');
+      $timeout.flush();
+      // 1 items selected, input should be less than full width minus the invisible text node and one item with
+      expect(searchInput.outerWidth()).toBe(fullWidth - matchItemWidth ); // remaining width of the row
+
+      clickItem(el, 'Samantha');
+      $timeout.flush();
+      // Input should be smaller than before
+      expect(searchInput.outerWidth()).toBe(fullWidth - (2 * matchItemWidth));
+
+      clickItem(el, 'Adrian');
+      $timeout.flush();
+      // Minimum input width is 50px, we should be on a new line now
+      expect(searchInput.outerWidth()).toBe(fullWidth);
+
+      el.remove();
+      style.remove();
+    });
+
     it('should update size of search input use container width', function () {
       scope.selection.selectedMultiple = [scope.people[4], scope.people[5]]; //Wladimir & Samantha
       var el = createUiSelectMultiple({

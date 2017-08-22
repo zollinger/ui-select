@@ -172,4 +172,24 @@ var uis = angular.module('ui.select', [])
       left: boundingClientRect.left + ($window.pageXOffset || $document[0].documentElement.scrollLeft)
     };
   };
+}])
+
+/**
+ * Gets an elements inner width (width minus padding)
+ */
+.factory('uisElementInnerWidth',
+  ['$window',
+  function ($window) {
+    return $window.jQuery ? getInnerWidthJQuery : getInnerWidth;
+
+    function getInnerWidthJQuery(element) {
+      return element.width();
+    }
+
+    function getInnerWidth(element) {
+      var style = $window.getComputedStyle(element[0]);
+      var paddingLeft = parseFloat(style.getPropertyValue('padding-left'));
+      var paddingRight = parseFloat(style.getPropertyValue('padding-right'));
+      return element[0].clientWidth - paddingLeft - paddingRight;
+    }
 }]);
